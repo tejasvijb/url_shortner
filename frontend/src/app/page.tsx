@@ -42,11 +42,12 @@ export default function Home() {
             <Button
               variant="ghost"
               className="text-white hover:bg-white/10 hover:text-blue-100"
+              asChild
             >
-              Sign in
+              <Link href="/sign-in" >Sign in</Link>
             </Button>
-            <Button className="bg-linear-to-r from-blue-500 to-rose-500 text-white shadow-lg shadow-blue-500/30">
-              Sign up
+            <Button className="bg-linear-to-r from-blue-500 to-rose-500 text-white shadow-lg shadow-blue-500/30" asChild>
+              <Link href="/sign-up">Sign up</Link>
             </Button>
           </div>
         </header>
