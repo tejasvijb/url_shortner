@@ -3,20 +3,42 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { authQueryOptions } from "@/api-config/queryOptions/authQueries";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 export default function SignUpPage() {
+  const router = useRouter();
+
+  const { mutate: signUpMutate, isPending } = useMutation({
+    mutationFn: authQueryOptions.signUpOptions.mutationFunction,
+    onSuccess: () => {
+      toast.success("Signed up successfully! Please sign in.");
+      router.push("/sign-in");
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      toast.error(`Sign up failed: ${error.response?.data?.message || error.message}`);
+    },
+  });
 
 
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Handle sign-up logic here
-    // console log the form values
     const form = event.currentTarget;
     const formData = new FormData(form);
-
+    const signUpData = {
+      firstName: formData.get("firstName") as string,
+      lastName: formData.get("lastName") as string,
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+    };
     const formValues = Object.fromEntries(formData.entries());
     console.log(formValues);
+    signUpMutate({ body: signUpData });
+
 
   }
 
@@ -127,8 +149,8 @@ export default function SignUpPage() {
                 , including the privacy policy.
               </span>
             </label>
-            <Button type="submit" className="w-full bg-linear-to-r from-blue-500 to-rose-500 text-base text-white shadow-lg shadow-rose-500/30">
-              Create account
+            <Button disabled={isPending} type="submit" className="w-full bg-linear-to-r from-blue-500 to-rose-500 text-base text-white shadow-lg shadow-rose-500/30">
+              {isPending ? "Creating account..." : "Create account"}
             </Button>
             <p className="text-center text-sm text-slate-300">
               Already have an account?{" "}

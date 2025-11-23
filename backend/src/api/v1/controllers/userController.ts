@@ -1,5 +1,5 @@
 import type { JwtUserPayload, LoginUserBody, RegisterUserBody } from "#/types/user.js";
-import type { Request, Response } from "express";
+import type { CookieOptions, Request, Response } from "express";
 import type { StringValue } from "ms";
 
 import bcrypt from "bcrypt";
@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 
 import UserModel from "../models/user.model.js";
 
-const TOKEN_EXPIRY: number | StringValue = (process.env.ACCESS_TOKEN_EXPIRY ?? "15m") as number | StringValue;
+const TOKEN_EXPIRY: StringValue = "30m";
 
 const normalizeEmail = (email?: string) => email?.trim().toLowerCase() ?? "";
 
@@ -90,6 +90,15 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   const accessToken = jwt.sign({ user: payload }, accessTokenSecret, {
     expiresIn: TOKEN_EXPIRY,
   });
+  const cookieOptions: CookieOptions = {
+    httpOnly: true,
+    maxAge: 30 * 60 * 1000, // 30 minutes
+    path: "/",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+  };
 
-  res.status(200).json({ accessToken, user: payload });
+  res.cookie("accessToken", accessToken, cookieOptions);
+
+  res.status(200).json({ user: payload });
 });

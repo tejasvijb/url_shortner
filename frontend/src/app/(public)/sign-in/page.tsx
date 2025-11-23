@@ -4,18 +4,37 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { useMutation } from "@tanstack/react-query";
+import { authQueryOptions } from "@/api-config/queryOptions/authQueries";
+import { toast } from "sonner"
+import { useRouter } from "next/navigation";
+
 
 export default function SignInPage() {
+  const router = useRouter();
+
+  const { mutate: loginMutate, isPending } = useMutation({
+    mutationFn: authQueryOptions.signInOptions.mutationFunction,
+    onSuccess: () => {
+      toast.success("Signed in successfully!");
+      router.push("/dashboard");
+    },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onError: (error: any) => {
+      toast.error(`Sign in failed: ${error.response?.data?.message || error.message}`);
+    },
+  })
 
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    // Handle sign-in logic here
-    // console log the form values
-
     const form = event.currentTarget;
     const formData = new FormData(form);
-    console.log(Object.fromEntries(formData.entries()));
+    const signInData = {
+      email: formData.get("email") as string,
+      password: formData.get("password") as string,
+    };
+    loginMutate({ body: signInData });
   }
 
   return (
@@ -87,8 +106,8 @@ export default function SignInPage() {
                 Forgot password?
               </Link>
             </div>
-            <Button className="w-full bg-linear-to-r from-blue-500 to-rose-500 text-base text-white shadow-lg shadow-blue-500/30">
-              Sign in
+            <Button disabled={isPending} className="w-full bg-linear-to-r from-blue-500 to-rose-500 text-base text-white shadow-lg shadow-blue-500/30">
+              {isPending ? "Signing in..." : "Sign in"}
             </Button>
             <p className="text-center text-sm text-slate-300">
               Don&apos;t have an account?{" "}
