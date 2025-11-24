@@ -29,14 +29,21 @@ export default function SignUpPage() {
     event.preventDefault();
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const password = formData.get("password") as string;
+    const confirmPassword = formData.get("confirmPassword") as string;
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
     const signUpData = {
       firstName: formData.get("firstName") as string,
       lastName: formData.get("lastName") as string,
       email: formData.get("email") as string,
-      password: formData.get("password") as string,
+      password: password,
     };
-    const formValues = Object.fromEntries(formData.entries());
-    console.log(formValues);
+
     signUpMutate({ body: signUpData });
 
 
