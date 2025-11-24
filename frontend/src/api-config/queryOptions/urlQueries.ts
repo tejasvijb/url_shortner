@@ -1,4 +1,4 @@
-import { queryOptions, useMutation, useQuery } from "@tanstack/react-query";
+import { queryOptions } from "@tanstack/react-query";
 import {
     createShortUrl,
     deleteShortUrl,
@@ -9,54 +9,38 @@ import {
 } from "../endpoints/shortUrlApi";
 import { CreateShortUrlRequestBody, UpdateShortUrlRequestBody } from "../types";
 
-/**
- * Query options and hooks for URL shortening operations
- */
+export const urlQueries = {
+    getUserUrlsOptions: (page: number = 1, limit: number = 10) =>
+        queryOptions({
+            queryFn: () => getUserUrls(page, limit),
+            queryKey: ["urls", "list", page, limit],
+        }),
 
-// ============= QUERY OPTIONS =============
+    /**
+     * Get public information about a URL
+     */
+    getUrlInfoOptions: (shortCode: string) =>
+        queryOptions({
+            queryFn: () => getUrlInfo(shortCode),
+            queryKey: ["urls", "info", shortCode],
+        }),
 
-/**
- * Get user's shortened URLs
- */
-export const getUserUrlsOptions = (page: number = 1, limit: number = 10) =>
-    queryOptions({
-        queryFn: () => getUserUrls(page, limit),
-        queryKey: ["urls", "list", page, limit],
-    });
-
-/**
- * Get public information about a URL
- */
-export const getUrlInfoOptions = (shortCode: string) =>
-    queryOptions({
-        queryFn: () => getUrlInfo(shortCode),
-        queryKey: ["urls", "info", shortCode],
-    });
-
-/**
- * Get analytics for a URL
- */
-export const getUrlAnalyticsOptions = (shortCode: string) =>
-    queryOptions({
-        queryFn: () => getUrlAnalytics(shortCode),
-        queryKey: ["urls", "analytics", shortCode],
-    });
+    getUrlAnalyticsOptions: (shortCode: string) =>
+        queryOptions({
+            queryFn: () => getUrlAnalytics(shortCode),
+            queryKey: ["urls", "analytics", shortCode],
+        }),
+};
 
 // ============= MUTATION OPTIONS =============
 
 export const urlMutationOptions = {
-    /**
-     * Create a new short URL mutation
-     */
     createShortUrl: {
         mutationFunction: ({ body }: { body: CreateShortUrlRequestBody }) => {
             return createShortUrl(body);
         },
     },
 
-    /**
-     * Update a short URL mutation
-     */
     updateShortUrl: {
         mutationFunction: ({
             shortCode,
@@ -68,10 +52,6 @@ export const urlMutationOptions = {
             return updateShortUrl(shortCode, body);
         },
     },
-
-    /**
-     * Delete a short URL mutation
-     */
     deleteShortUrl: {
         mutationFunction: ({ shortCode }: { shortCode: string }) => {
             return deleteShortUrl(shortCode);
@@ -79,64 +59,64 @@ export const urlMutationOptions = {
     },
 };
 
-// ============= CUSTOM HOOKS (Optional) =============
+// // ============= CUSTOM HOOKS (Optional) =============
 
-/**
- * Hook to fetch user's shortened URLs
- */
-export const useGetUserUrls = (page: number = 1, limit: number = 10) => {
-    return useQuery(getUserUrlsOptions(page, limit));
-};
+// /**
+//  * Hook to fetch user's shortened URLs
+//  */
+// export const useGetUserUrls = (page: number = 1, limit: number = 10) => {
+//     return useQuery(getUserUrlsOptions(page, limit));
+// };
 
-/**
- * Hook to fetch URL info
- */
-export const useGetUrlInfo = (shortCode: string) => {
-    return useQuery(getUrlInfoOptions(shortCode));
-};
+// /**
+//  * Hook to fetch URL info
+//  */
+// export const useGetUrlInfo = (shortCode: string) => {
+//     return useQuery(getUrlInfoOptions(shortCode));
+// };
 
-/**
- * Hook to fetch URL analytics
- */
-export const useGetUrlAnalytics = (shortCode: string) => {
-    return useQuery(getUrlAnalyticsOptions(shortCode));
-};
+// /**
+//  * Hook to fetch URL analytics
+//  */
+// export const useGetUrlAnalytics = (shortCode: string) => {
+//     return useQuery(getUrlAnalyticsOptions(shortCode));
+// };
 
-/**
- * Hook to create a short URL
- */
-export const useCreateShortUrl = () => {
-    return useMutation({
-        mutationFn: ({ body }: { body: CreateShortUrlRequestBody }) => {
-            return createShortUrl(body);
-        },
-    });
-};
+// /**
+//  * Hook to create a short URL
+//  */
+// export const useCreateShortUrl = () => {
+//     return useMutation({
+//         mutationFn: ({ body }: { body: CreateShortUrlRequestBody }) => {
+//             return createShortUrl(body);
+//         },
+//     });
+// };
 
-/**
- * Hook to update a short URL
- */
-export const useUpdateShortUrl = () => {
-    return useMutation({
-        mutationFn: ({
-            shortCode,
-            body,
-        }: {
-            shortCode: string;
-            body: UpdateShortUrlRequestBody;
-        }) => {
-            return updateShortUrl(shortCode, body);
-        },
-    });
-};
+// /**
+//  * Hook to update a short URL
+//  */
+// export const useUpdateShortUrl = () => {
+//     return useMutation({
+//         mutationFn: ({
+//             shortCode,
+//             body,
+//         }: {
+//             shortCode: string;
+//             body: UpdateShortUrlRequestBody;
+//         }) => {
+//             return updateShortUrl(shortCode, body);
+//         },
+//     });
+// };
 
-/**
- * Hook to delete a short URL
- */
-export const useDeleteShortUrl = () => {
-    return useMutation({
-        mutationFn: ({ shortCode }: { shortCode: string }) => {
-            return deleteShortUrl(shortCode);
-        },
-    });
-};
+// /**
+//  * Hook to delete a short URL
+//  */
+// export const useDeleteShortUrl = () => {
+//     return useMutation({
+//         mutationFn: ({ shortCode }: { shortCode: string }) => {
+//             return deleteShortUrl(shortCode);
+//         },
+//     });
+// };

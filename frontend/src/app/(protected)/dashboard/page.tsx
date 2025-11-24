@@ -9,40 +9,60 @@ import {
   Heart,
   Calendar,
 } from 'lucide-react';
+import { toast } from 'sonner';
+import { urlMutationOptions } from '@/api-config/queryOptions/urlQueries';
+import { useMutation } from '@tanstack/react-query';
+import { addDaysToCurrentDate } from '@/lib/utils';
+import { AxiosError } from 'axios';
+import { SuccessDialog } from './components/ShortUrlDialog';
 
 export default function Dashboard() {
   const [longUrl, setLongUrl] = useState('');
   const [useCustomAlias, setUseCustomAlias] = useState(false);
   const [customAlias, setCustomAlias] = useState('');
   const [setExpiration, setSetExpiration] = useState(false);
-  const [expirationDays, setExpirationDays] = useState('7');
-  const [isLoading, setIsLoading] = useState(false);
+  const [expirationDays, setExpirationDays] = useState('1');
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [shortUrl, setShortUrl] = useState('');
+
+
+  const { mutate: createShortUrlMutate, isPending: isCreatingShortUrl } = useMutation({
+    mutationFn: urlMutationOptions.createShortUrl.mutationFunction,
+    onSuccess: (data) => {
+      toast.success(`Short URL created: ${data.data.shortCode}`);
+      setShortUrl(`${process.env.NEXT_PUBLIC_APP_URL}/${data.data.shortCode}`);
+      setSuccessDialogOpen(true);
+
+    },
+    onError: (error: AxiosError<{ error: string }>) => {
+      toast.error(`Failed to create short URL: ${error.response?.data?.error || error.message}`);
+    }
+  });
 
   const handleReset = () => {
     setLongUrl('');
     setCustomAlias('');
-    setExpirationDays('7');
+    setExpirationDays('1');
     setUseCustomAlias(false);
     setSetExpiration(false);
   };
 
   const handleShortenUrl = async () => {
     if (!longUrl.trim()) {
-      alert('Please enter a URL');
+      toast.error('Please enter a URL');
       return;
     }
 
-    setIsLoading(true);
-    try {
-      // API call will be implemented
-      console.log({
-        longUrl,
-        customAlias: useCustomAlias ? customAlias : undefined,
-        expirationDays: setExpiration ? parseInt(expirationDays) : undefined,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    createShortUrlMutate({
+      body: {
+        originalUrl: longUrl,
+        customAlias: useCustomAlias ? customAlias.trim() : undefined,
+        expiresAt: setExpiration ? addDaysToCurrentDate(parseInt(expirationDays, 10)) : undefined,
+      }
+    })
+
+    handleReset();
+
   };
 
   return (
@@ -176,7 +196,7 @@ export default function Dashboard() {
                       type="number"
                       min="1"
                       max="3650"
-                      placeholder="7"
+                      placeholder="1"
                       value={expirationDays}
                       onChange={(e) => setExpirationDays(e.target.value)}
                       className="pl-10 bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-500 focus-visible:border-green-500 focus-visible:ring-green-500/30"
@@ -200,14 +220,19 @@ export default function Dashboard() {
               </Button>
               <Button
                 onClick={handleShortenUrl}
-                disabled={isLoading}
+                disabled={isCreatingShortUrl}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6"
               >
-                {isLoading ? 'Shortening...' : 'Shorten URL'}
+                {isCreatingShortUrl ? 'Shortening...' : 'Shorten URL'}
               </Button>
             </div>
           </div>
         </div>
+        <SuccessDialog
+          open={successDialogOpen}
+          onOpenChange={setSuccessDialogOpen}
+          shortUrl={shortUrl}
+        />
 
 
       </div>
