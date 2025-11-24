@@ -50,3 +50,68 @@ export type AuthErrorResponse = {
     message: string;
     title?: string;
 };
+
+// ============= SHORT URL TYPES =============
+
+// Short URL request body types
+export type CreateShortUrlRequestBody = {
+    originalUrl: string;
+    customAlias?: string;
+    expiresAt?: string;
+    description?: string;
+    tags?: string[];
+};
+
+export type UpdateShortUrlRequestBody = {
+    customAlias?: string;
+    description?: string;
+    expiresAt?: string;
+    tags?: string[];
+};
+
+// Short URL response types
+export type ShortUrlInfo = {
+    id: string;
+    shortCode: string;
+    originalUrl: string;
+    customAlias?: string;
+    clickCount: number;
+    lastClickedAt?: Date;
+    isActive: boolean;
+    description?: string;
+    tags?: string[];
+    expiresAt?: Date;
+    createdAt: Date;
+};
+
+export type CreateShortUrlAPIResponse = ShortUrlInfo;
+
+export type UpdateShortUrlAPIResponse = ShortUrlInfo;
+
+export type GetUrlInfoAPIResponse = ShortUrlInfo;
+
+export type GetUrlAnalyticsAPIResponse = {
+    shortCode: string;
+    customAlias?: string;
+    clickCount: number;
+    lastClicked?: Date;
+};
+
+export type GetUserUrlsAPIResponse = {
+    data: ShortUrlInfo[];
+    pagination: {
+        currentPage: number;
+        limit: number;
+        total: number;
+        totalPages: number;
+    };
+};
+
+export type DeleteShortUrlAPIResponse = {
+    message: string;
+};
+
+// Error response type
+export type ShortUrlErrorResponse = {
+    error: string;
+};
