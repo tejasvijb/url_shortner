@@ -189,6 +189,8 @@ export const redirectShortUrl = asyncHandler(async (req: Request, res: Response)
     isActive: true,
   });
 
+  console.log(shortUrl);
+
   if (!shortUrl) {
     res.status(404).json({ error: "Short URL not found" });
     return;
@@ -207,8 +209,8 @@ export const redirectShortUrl = asyncHandler(async (req: Request, res: Response)
   shortUrl.lastClickedAt = new Date();
   await shortUrl.save();
 
-  // Redirect to original URL
-  res.redirect(301, shortUrl.originalUrl);
+  // // Redirect to original URL
+  res.status(200).json({ originalUrl: shortUrl.originalUrl });
 });
 
 /**

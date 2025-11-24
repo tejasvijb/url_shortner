@@ -9,7 +9,7 @@ import {
 
 // Set different base URL based on the environment
 
-const axiosParams = { 
+const axiosParams = {
     baseURL: process.env.NEXT_PUBLIC_BASE_URL,
     withCredentials: true,
 };
@@ -23,7 +23,10 @@ axiosInstance.interceptors.response.use(
     (error) => {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
             // Only redirect if not already on sign-in page
-            if (typeof window !== "undefined" && !window.location.pathname.includes("/sign-in")) {
+            if (
+                typeof window !== "undefined" &&
+                !window.location.pathname.includes("/sign-in")
+            ) {
                 window.location.href = "/sign-in";
             }
         }
@@ -66,7 +69,7 @@ const withAbort = <T>(fn: WithAbortFn) => {
                 return await fn<T>(url, config);
             }
         } catch (error) {
-            console.log("api error", error);
+            // console.log("api error", error);
             // Add "aborted" property to the error if the request was cancelled
             if (didAbort(error)) {
                 error.aborted = true;

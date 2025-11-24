@@ -84,6 +84,10 @@ export type ShortUrlInfo = {
     createdAt: Date;
 };
 
+export type RedirectShortUrlAPIResponse = {
+    originalUrl: string;
+};
+
 export type CreateShortUrlAPIResponse = ShortUrlInfo;
 
 export type UpdateShortUrlAPIResponse = ShortUrlInfo;

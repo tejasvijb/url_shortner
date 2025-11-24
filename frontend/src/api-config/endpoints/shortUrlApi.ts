@@ -8,6 +8,7 @@ import {
     UpdateShortUrlRequestBody,
     UpdateShortUrlAPIResponse,
     DeleteShortUrlAPIResponse,
+    RedirectShortUrlAPIResponse,
 } from "../types";
 
 const URLS = {
@@ -47,7 +48,9 @@ export const getUrlInfo = (shortCode: string) => {
  * Redirect to original URL (public endpoint, not typically called from frontend)
  */
 export const redirectShortUrl = (shortCodeOrAlias: string) => {
-    return api.get(`${URLS.redirect}/${shortCodeOrAlias}`);
+    return api.get<RedirectShortUrlAPIResponse>(
+        `${URLS.redirect}/${shortCodeOrAlias}`
+    );
 };
 
 /**

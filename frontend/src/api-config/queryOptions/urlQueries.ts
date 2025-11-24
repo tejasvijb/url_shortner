@@ -5,11 +5,20 @@ import {
     getUrlAnalytics,
     getUrlInfo,
     getUserUrls,
+    redirectShortUrl,
     updateShortUrl,
 } from "../endpoints/shortUrlApi";
 import { CreateShortUrlRequestBody, UpdateShortUrlRequestBody } from "../types";
 
 export const urlQueries = {
+    redirectShortUrlOptions: (shortCodeOrAlias: string) =>
+        queryOptions({
+            queryFn: () => redirectShortUrl(shortCodeOrAlias),
+            queryKey: ["urls", "redirect", shortCodeOrAlias],
+            refetchOnMount: "always",
+            retry: false,
+        }),
+
     getUserUrlsOptions: (page: number = 1, limit: number = 10) =>
         queryOptions({
             queryFn: () => getUserUrls(page, limit),
