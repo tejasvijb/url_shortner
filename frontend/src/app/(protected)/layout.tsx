@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import AuthProvider from "../providers/AuthProvider"
+import { useAuth } from "../hooks/useAuth"
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard" },
@@ -16,7 +17,7 @@ const navItems = [
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  // const { isCurrentUserLoading, isCurrentUserAuthenticated } = useAuth();
+  const { logout, isLoggingOut } = useAuth();
 
 
   return (
@@ -53,8 +54,10 @@ export default function MainLayout({ children }: { children: ReactNode }) {
                 <Button
                   size="sm"
                   className="bg-linear-to-r from-blue-500 to-rose-500 text-white shadow-lg shadow-blue-500/30"
+                  onClick={() => logout()}
+                  disabled={isLoggingOut}
                 >
-                  Sign out
+                  {isLoggingOut ? "Signing out..." : "Sign out"}
                 </Button>
               </div>
             </div>

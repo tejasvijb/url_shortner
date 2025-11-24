@@ -17,6 +17,20 @@ const axiosParams = {
 // Create axios instance with default params
 const axiosInstance = axios.create(axiosParams);
 
+// Add response interceptor to handle 401 errors
+axiosInstance.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (axios.isAxiosError(error) && error.response?.status === 401) {
+            // Only redirect if not already on sign-in page
+            if (typeof window !== "undefined" && !window.location.pathname.includes("/sign-in")) {
+                window.location.href = "/sign-in";
+            }
+        }
+        return Promise.reject(error);
+    }
+);
+
 export const didAbort = (
     error: unknown
 ): error is Cancel & { aborted: boolean } => axios.isCancel(error);

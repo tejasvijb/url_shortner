@@ -53,8 +53,6 @@ const userSchema = new Schema<BaseUserAttributes>(
   },
 );
 
-userSchema.index({ email: 1 }, { collation: { locale: "en", strength: 2 }, unique: true });
-
 const UserModel = (mongoose.models.User as UserModelType) ?? mongoose.model<BaseUserAttributes, UserModelType>("User", userSchema);
 
 export default UserModel;

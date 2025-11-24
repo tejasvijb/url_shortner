@@ -11,6 +11,7 @@ const URLS = {
     login: "/users/login",
     register: "/users/register",
     me: "/users/me",
+    logout: "/users/logout",
 };
 
 export const userLogin = (body: LoginRequestBody) => {
@@ -23,4 +24,8 @@ export const userRegister = (body: RegisterRequestBody) => {
 
 export const fetchCurrentUser = () => {
     return api.get<CurrentUserAPIResponse>(URLS.me);
+};
+
+export const userLogout = () => {
+    return api.post(URLS.logout, {});
 };

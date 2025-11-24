@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 
 import UserModel from "../models/user.model.js";
 
-const TOKEN_EXPIRY: StringValue = "30m";
+const TOKEN_EXPIRY: StringValue = "15m";
 
 const normalizeEmail = (email?: string) => email?.trim().toLowerCase() ?? "";
 
@@ -92,7 +92,7 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   });
   const cookieOptions: CookieOptions = {
     httpOnly: true,
-    maxAge: 30 * 60 * 1000, // 30 minutes
+    maxAge: 15 * 60 * 1000, // 15 minutes
     path: "/",
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     secure: process.env.NODE_ENV === "production",
@@ -101,4 +101,15 @@ export const loginUser = asyncHandler(async (req: Request, res: Response) => {
   res.cookie("accessToken", accessToken, cookieOptions);
 
   res.status(200).json({ user: payload });
+});
+
+export const logoutUser = asyncHandler(async (req: Request, res: Response) => {
+  res.clearCookie("accessToken", {
+    httpOnly: true,
+    path: "/",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: process.env.NODE_ENV === "production",
+  });
+
+  res.status(200).json({ message: "Logged out successfully" });
 });
