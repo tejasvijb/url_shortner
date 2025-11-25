@@ -67,11 +67,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen  max-sm:p-2">
-      <div className="max-w-4xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
-        <div className="space-y-2">
+        <div className="mb-8">
           <h1 className="text-4xl font-bold text-white">URL Dashboard</h1>
-          <p className="text-slate-400">Manage and monitor your shortened URLs</p>
+          <p className="text-slate-400 mt-2">Manage and monitor your shortened URLs</p>
         </div>
 
         {/* Shorten URL Card */}

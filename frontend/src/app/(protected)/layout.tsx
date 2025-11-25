@@ -17,8 +17,11 @@ const navItems = [
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  const { logout, isLoggingOut } = useAuth();
+  const { logout, isLoggingOut, currentUserData } = useAuth();
 
+  const userInitials = currentUserData?.data?.user
+    ? `${currentUserData.data.user.firstName[0]}${currentUserData.data.user.lastName[0]}`.toUpperCase()
+    : "?";
 
   return (
     <AuthProvider>
@@ -49,7 +52,7 @@ export default function MainLayout({ children }: { children: ReactNode }) {
               </nav>
               <div className="flex items-center gap-3">
                 <div className="flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/10 text-xs font-semibold uppercase text-slate-100">
-                  JD
+                  {userInitials}
                 </div>
                 <Button
                   size="sm"
