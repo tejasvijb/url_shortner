@@ -2,6 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import {
     createShortUrl,
     deleteShortUrl,
+    getGlobalUrlAnalytics,
     getUrlAnalytics,
     getUrlInfo,
     getUserUrls,
@@ -38,6 +39,12 @@ export const urlQueries = {
         queryOptions({
             queryFn: () => getUrlAnalytics(shortCode),
             queryKey: ["urls", "analytics", shortCode],
+        }),
+
+    getGlobalUrlAnalyticsOptions: () =>
+        queryOptions({
+            queryFn: () => getGlobalUrlAnalytics(),
+            queryKey: ["urls", "analytics", "global"],
         }),
 };
 

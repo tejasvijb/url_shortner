@@ -5,6 +5,7 @@ import {
     GetUserUrlsAPIResponse,
     GetUrlInfoAPIResponse,
     GetUrlAnalyticsAPIResponse,
+    GetGlobalUrlAnalyticsAPIResponse,
     UpdateShortUrlRequestBody,
     UpdateShortUrlAPIResponse,
     DeleteShortUrlAPIResponse,
@@ -17,6 +18,7 @@ const URLS = {
     info: "/urls/info",
     redirect: "/urls",
     analytics: "/urls",
+    globalAnalytics: "/urls/analytics/global",
     update: "/urls",
     delete: "/urls",
 };
@@ -80,4 +82,11 @@ export const getUrlAnalytics = (shortCode: string) => {
     return api.get<GetUrlAnalyticsAPIResponse>(
         `${URLS.analytics}/${shortCode}/analytics`
     );
+};
+
+/**
+ * Get global analytics for all user's shortened URLs
+ */
+export const getGlobalUrlAnalytics = () => {
+    return api.get<GetGlobalUrlAnalyticsAPIResponse>(URLS.globalAnalytics);
 };

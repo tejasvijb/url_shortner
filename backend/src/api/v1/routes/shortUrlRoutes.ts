@@ -3,6 +3,7 @@ import { Router } from "express";
 import {
   createShortUrl,
   deleteShortUrl,
+  getGlobalUrlAnalytics,
   getUrlAnalytics,
   getUrlInfo,
   getUserUrls,
@@ -16,12 +17,6 @@ const router = Router();
 /**
  * Public Routes
  */
-
-/**
- * Redirect to original URL
- * GET /:shortCodeOrAlias
- */
-router.get("/:shortCodeOrAlias", redirectShortUrl);
 
 /**
  * Get public information about a short URL
@@ -40,10 +35,22 @@ router.get("/info/:shortCode", getUrlInfo);
 router.post("/", validateToken, createShortUrl);
 
 /**
+ * Get global analytics for all user's shortened URLs
+ * GET /analytics/global
+ */
+router.get("/analytics/global", validateToken, getGlobalUrlAnalytics);
+
+/**
  * Get all short URLs for authenticated user
  * GET /
  */
 router.get("/", validateToken, getUserUrls);
+
+/**
+ * Get analytics for a short URL
+ * GET /:shortCode/analytics
+ */
+router.get("/:shortCode/analytics", validateToken, getUrlAnalytics);
 
 /**
  * Update a short URL
@@ -58,9 +65,9 @@ router.put("/:shortCode", validateToken, updateShortUrl);
 router.delete("/:shortCode", validateToken, deleteShortUrl);
 
 /**
- * Get analytics for a short URL
- * GET /:shortCode/analytics
+ * Redirect to original URL (must be last to avoid conflicts)
+ * GET /:shortCodeOrAlias
  */
-router.get("/:shortCode/analytics", validateToken, getUrlAnalytics);
+router.get("/:shortCodeOrAlias", redirectShortUrl);
 
 export default router;

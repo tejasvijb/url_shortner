@@ -3,6 +3,7 @@ import type { Request, Response } from "express";
 import { CreateShortUrlBody, UpdateShortUrlBody } from "#/types/shortUrl.js";
 import { generateShortCode, isReservedAlias, isUrlExpired, validateCustomAlias, validateUrl } from "#/utils/shortUrlUtils.js";
 import asyncHandler from "express-async-handler";
+import mongoose from "mongoose";
 
 import ShortUrl from "../models/shortUrl.model.js";
 
@@ -345,5 +346,26 @@ export const getUrlAnalytics = asyncHandler(async (req: Request, res: Response) 
     customAlias: shortUrl.customAlias,
     lastClicked: shortUrl.lastClickedAt,
     shortCode: shortUrl.shortCode,
+  });
+});
+
+export const getGlobalUrlAnalytics = asyncHandler(async (req: Request, res: Response) => {
+  const userId = req.user?.id;
+  if (!userId) {
+    res.status(401).json({ error: "Unauthorized" });
+    return;
+  }
+
+  const totalUrls = await ShortUrl.countDocuments({ userId });
+  const totalClicksAggregate = await ShortUrl.aggregate([
+    { $match: { userId: new mongoose.Types.ObjectId(userId) } },
+    { $group: { _id: null, totalClicks: { $sum: "$clickCount" } } },
+  ]);
+
+  const totalClicks = totalClicksAggregate[0]?.totalClicks || 0;
+
+  res.json({
+    totalClicks,
+    totalUrls,
   });
 });

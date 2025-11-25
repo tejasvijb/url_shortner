@@ -111,6 +111,11 @@ export type GetUserUrlsAPIResponse = {
     };
 };
 
+export type GetGlobalUrlAnalyticsAPIResponse = {
+    totalUrls: number;
+    totalClicks: number;
+};
+
 export type DeleteShortUrlAPIResponse = {
     message: string;
 };
