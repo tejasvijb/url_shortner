@@ -56,7 +56,7 @@
     "typescript-eslint": "^8.46.2"
   },
   "imports": {
-    "#/*": "./src/*"
+    "#/*": "./dist/src/*"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
