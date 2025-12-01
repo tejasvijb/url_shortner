@@ -30,7 +30,6 @@ export default function UrlRedirectPage() {
     if (error && isApiError(error)) {
       const statusCode = error.response?.status;
 
-      console.log(statusCode)
 
       // Handle 404 - short URL not found
       if (statusCode === 404) {

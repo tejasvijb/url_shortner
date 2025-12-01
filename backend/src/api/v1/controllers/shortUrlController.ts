@@ -190,8 +190,6 @@ export const redirectShortUrl = asyncHandler(async (req: Request, res: Response)
     isActive: true,
   });
 
-  console.log(shortUrl);
-
   if (!shortUrl) {
     res.status(404).json({ error: "Short URL not found" });
     return;

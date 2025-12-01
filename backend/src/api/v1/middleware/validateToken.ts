@@ -8,8 +8,7 @@ import UserModel from "../models/user.model.js";
 
 const validateToken = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
   const authToken = req.cookies.accessToken;
-  console.log("Cookies:", req.cookies);
-  console.log("Access Token:", authToken);
+
   if (!authToken) {
     res.status(401);
     throw new Error("User is not authorized or token is missing");

@@ -69,7 +69,6 @@ const withAbort = <T>(fn: WithAbortFn) => {
                 return await fn<T>(url, config);
             }
         } catch (error) {
-            // console.log("api error", error);
             // Add "aborted" property to the error if the request was cancelled
             if (didAbort(error)) {
                 error.aborted = true;

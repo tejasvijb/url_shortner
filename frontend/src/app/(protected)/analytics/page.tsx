@@ -21,7 +21,6 @@ export default function Analytics() {
   const urls = userUrlsResponse?.data?.data || [];
 
 
-  console.log(globalAnalytics)
 
   if (isLoading) {
     return (
