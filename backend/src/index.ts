@@ -5,6 +5,7 @@ import morgan from "morgan";
 
 import connectDb from "./api/v1/config/dbConnection.js";
 import apiV1Router from "./api/v1/index.js";
+import "./utils/redisClient.js"; // Initialize Redis connection
 const app = express();
 
 connectDb();

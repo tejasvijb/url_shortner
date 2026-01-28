@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 
 import { CreateShortUrlBody, UpdateShortUrlBody } from "#/types/shortUrl.js";
+import { getCachedData, getUrlInfoCacheKey, invalidateUrlCache, setCachedData } from "#/utils/cacheService.js";
 import { generateShortCode, isReservedAlias, isUrlExpired, validateCustomAlias, validateUrl } from "#/utils/shortUrlUtils.js";
 import asyncHandler from "express-async-handler";
 import mongoose from "mongoose";
@@ -151,6 +152,14 @@ export const getUserUrls = asyncHandler(async (req: Request, res: Response) => {
 export const getUrlInfo = asyncHandler(async (req: Request, res: Response) => {
   const { shortCode } = req.params;
 
+  // Try to get from cache first
+  const cacheKey = getUrlInfoCacheKey(shortCode);
+  const cached = await getCachedData(cacheKey);
+  if (cached) {
+    res.json(cached);
+    return;
+  }
+
   const shortUrl = await ShortUrl.findOne({ isActive: true, shortCode });
   if (!shortUrl) {
     res.status(404).json({ error: "Short URL not found" });
@@ -163,7 +172,7 @@ export const getUrlInfo = asyncHandler(async (req: Request, res: Response) => {
     return;
   }
 
-  res.json({
+  const responseData = {
     clickCount: shortUrl.clickCount,
     createdAt: shortUrl.createdAt,
     customAlias: shortUrl.customAlias,
@@ -174,7 +183,12 @@ export const getUrlInfo = asyncHandler(async (req: Request, res: Response) => {
     originalUrl: shortUrl.originalUrl,
     shortCode: shortUrl.shortCode,
     tags: shortUrl.tags,
-  });
+  };
+
+  // Cache the response
+  await setCachedData(cacheKey, responseData);
+
+  res.json(responseData);
 });
 
 /**
@@ -183,6 +197,14 @@ export const getUrlInfo = asyncHandler(async (req: Request, res: Response) => {
  */
 export const redirectShortUrl = asyncHandler(async (req: Request, res: Response) => {
   const { shortCodeOrAlias } = req.params;
+
+  // Try to get from cache first
+  const cacheKey = getUrlInfoCacheKey(shortCodeOrAlias);
+  const cached = await getCachedData(cacheKey);
+  if (cached) {
+    res.status(200).json({ originalUrl: cached.originalUrl });
+    return;
+  }
 
   // Try to find by custom alias first, then by short code
   const shortUrl = await ShortUrl.findOne({
@@ -208,6 +230,21 @@ export const redirectShortUrl = asyncHandler(async (req: Request, res: Response)
   shortUrl.lastClickedAt = new Date();
   await shortUrl.save();
 
+  // Cache the URL info (without updating click count in cache for consistency)
+  const cacheData = {
+    clickCount: shortUrl.clickCount - 1, // Cache the count before increment
+    createdAt: shortUrl.createdAt,
+    customAlias: shortUrl.customAlias,
+    description: shortUrl.description,
+    expiresAt: shortUrl.expiresAt,
+    id: shortUrl._id,
+    isActive: shortUrl.isActive,
+    originalUrl: shortUrl.originalUrl,
+    shortCode: shortUrl.shortCode,
+    tags: shortUrl.tags,
+  };
+  await setCachedData(cacheKey, cacheData);
+
   // // Redirect to original URL
   res.status(200).json({ originalUrl: shortUrl.originalUrl });
 });
@@ -231,6 +268,8 @@ export const updateShortUrl = asyncHandler(async (req: Request, res: Response) =
     res.status(404).json({ error: "Short URL not found" });
     return;
   }
+
+  const oldCustomAlias = shortUrl.customAlias;
 
   // Validate and update custom alias if provided
   if (customAlias !== undefined) {
@@ -280,6 +319,9 @@ export const updateShortUrl = asyncHandler(async (req: Request, res: Response) =
 
   await shortUrl.save();
 
+  // Invalidate cache for this URL
+  await invalidateUrlCache(shortCode, oldCustomAlias || undefined);
+
   res.json({
     clickCount: shortUrl.clickCount,
     createdAt: shortUrl.createdAt,
@@ -316,6 +358,9 @@ export const deleteShortUrl = asyncHandler(async (req: Request, res: Response) =
   // Soft delete - mark as inactive
   shortUrl.isActive = false;
   await shortUrl.save();
+
+  // Invalidate cache for this URL
+  await invalidateUrlCache(shortCode, shortUrl.customAlias || undefined);
 
   res.json({ message: "Short URL deleted successfully" });
 });
